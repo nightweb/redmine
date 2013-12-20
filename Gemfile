@@ -1,11 +1,14 @@
 source 'https://rubygems.org'
 
-gem "rails", "3.2.16"
+gem "rails", "~> 4.0.0"
+# gem "rails", :git => "git://github.com/rails/rails.git", :branch => "4-0-stable"
 gem "jquery-rails", "~> 2.0.2"
 gem "coderay", "~> 1.1.0"
 gem "fastercsv", "~> 1.5.0", :platforms => [:mri_18, :mingw_18, :jruby]
-gem "builder", "3.0.0"
 gem "mime-types"
+# gem "builder", "3.0.0"
+gem "protected_attributes"
+gem "actionpack-action_caching"
 
 gem "awesome_nested_set",
     :git => "git://github.com/collectiveidea/awesome_nested_set.git",
