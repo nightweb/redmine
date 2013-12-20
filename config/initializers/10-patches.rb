@@ -92,6 +92,7 @@ end
 ActionView::Base.field_error_proc = Proc.new{ |html_tag, instance| html_tag || ''.html_safe }
 
 # HTML5: <option value=""></option> is invalid, use <option value="">&nbsp;</option> instead
+if false
 module ActionView
   module Helpers
     class InstanceTag
@@ -126,6 +127,7 @@ module ActionView
       alias_method_chain :options_for_select, :non_empty_blank_option
     end
   end
+end
 end
 
 require 'mail'
