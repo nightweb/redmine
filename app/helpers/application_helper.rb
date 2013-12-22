@@ -1181,7 +1181,7 @@ module ApplicationHelper
         source
       end
     end
-    super sources, options
+    super *sources, options
   end
 
   # Overrides Rails' image_tag with themes and plugins support.
@@ -1214,7 +1214,7 @@ module ApplicationHelper
         end
       end
     end
-    super sources, options
+    super *sources, options
   end
 
   # TODO: remove this in 2.5.0
