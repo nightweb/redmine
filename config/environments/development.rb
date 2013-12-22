@@ -14,5 +14,7 @@ RedmineApp::Application.configure do
 
   config.active_support.deprecation = [:stderr, :log]
 
+  config.secret_token = 'a secret token for developemnt'
+
   config.eager_load = false
 end
