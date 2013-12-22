@@ -107,4 +107,22 @@ namespace :test do
     t.test_files = FileList['test/ui/**/*_test.rb']
   end
   Rake::Task['test:ui'].comment = "Run the UI tests with Capybara (PhantomJS listening on port 4444 is required)"
+
+  Rake::TestTask.new(:rails4units => "db:test:prepare") do |t|
+    t.libs << "test"
+    t.verbose = true
+    t.test_files = FileList['test/unit/**/*_test.rb']
+  end
+
+  Rake::TestTask.new(:rails4functionals => "db:test:prepare") do |t|
+    t.libs << "test"
+    t.verbose = true
+    t.test_files = FileList['test/functional/**/*_test.rb']
+  end
+
+  Rake::TestTask.new(:rails4integration => "db:test:prepare") do |t|
+    t.libs << "test"
+    t.verbose = true
+    t.test_files = FileList['test/integration/**/*_test.rb']
+  end
 end
