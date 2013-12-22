@@ -55,6 +55,7 @@ module ActionView
 end
 
 # Do not HTML escape text templates
+if false
 module ActionView
   class Template
     module Handlers
@@ -87,6 +88,7 @@ module ActionView
       end
     end
   end
+end
 end
 
 ActionView::Base.field_error_proc = Proc.new{ |html_tag, instance| html_tag || ''.html_safe }
