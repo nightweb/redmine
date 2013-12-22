@@ -91,7 +91,7 @@ group :development do
 end
 
 group :test do
-  gem "shoulda", "~> 3.3.2"
+  gem "shoulda", "~> 3.5.0"
   gem "mocha", ">= 0.14", :require => 'mocha/api'
   if RUBY_VERSION >= '1.9.3'
     gem "capybara", "~> 2.1.0"
