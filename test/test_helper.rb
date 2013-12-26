@@ -24,6 +24,11 @@ require Rails.root.join('test', 'mocks', 'open_id_authentication_mock.rb').to_s
 require File.expand_path(File.dirname(__FILE__) + '/object_helpers')
 include ObjectHelpers
 
+class ActionView::TestCase
+  helper :application
+  include ApplicationHelper
+end
+
 class ActiveSupport::TestCase
   include ActionDispatch::TestProcess
 
