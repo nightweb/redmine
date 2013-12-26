@@ -54,6 +54,10 @@ module RedmineApp
 
     config.session_store :cookie_store, :key => '_redmine_session'
 
+    # TODO:
+    # On Rails4, AR.new and AR.create fail
+    config.active_record.whitelist_attributes = false
+
     if File.exists?(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
       instance_eval File.read(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
     end
