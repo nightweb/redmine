@@ -26,11 +26,10 @@ class Principal < ActiveRecord::Base
 
   has_many :members, :foreign_key => 'user_id', :dependent => :destroy
   has_many :memberships, :class_name => 'Member',
-           :foreign_key => 'user_id',
-           :include => [:project, :roles],
-           :conditions => "#{Project.table_name}.status<>#{Project::STATUS_ARCHIVED}",
-           :order => "#{Project.table_name}.name"
-  has_many :projects, :through => :memberships
+           :foreign_key => 'user_id'
+  has_many :projects,
+           -> {where("status <> #{Project::STATUS_ARCHIVED}").order(:name)},
+           :through => :memberships
   has_many :issue_categories, :foreign_key => 'assigned_to_id', :dependent => :nullify
 
   # Groups and active users
