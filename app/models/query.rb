@@ -273,7 +273,7 @@ class Query < ActiveRecord::Base
   end
 
   def trackers
-    @trackers ||= project.nil? ? Tracker.sorted.all : project.rolled_up_trackers
+    @trackers ||= project.nil? ? Tracker.sorted.to_a : project.rolled_up_trackers
   end
 
   # Returns a hash of localized labels for all filter operators
@@ -291,7 +291,7 @@ class Query < ActiveRecord::Base
   end
 
   def all_projects
-    @all_projects ||= Project.visible.all
+    @all_projects ||= Project.visible.to_a
   end
 
   def all_projects_values

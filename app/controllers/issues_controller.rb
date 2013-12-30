@@ -111,7 +111,7 @@ class IssuesController < ApplicationController
     @journals.reject! {|journal| !journal.notes? && journal.visible_details.empty?}
     @journals.reverse! if User.current.wants_comments_in_reverse_order?
 
-    @changesets = @issue.changesets.visible.all
+    @changesets = @issue.changesets.visible.to_a
     @changesets.reverse! if User.current.wants_comments_in_reverse_order?
 
     @relations = @issue.relations.select {|r| r.other_issue(@issue) && r.other_issue(@issue).visible? }
@@ -188,7 +188,7 @@ class IssuesController < ApplicationController
     rescue ActiveRecord::StaleObjectError
       @conflict = true
       if params[:last_journal_id]
-        @conflict_journals = @issue.journals_after(params[:last_journal_id]).all
+        @conflict_journals = @issue.journals_after(params[:last_journal_id]).to_a
         @conflict_journals.reject!(&:private_notes?) unless User.current.allowed_to?(:view_private_notes, @issue.project)
       end
     end
@@ -300,7 +300,7 @@ class IssuesController < ApplicationController
     else
       @saved_issues = @issues
       @unsaved_issues = unsaved_issues
-      @issues = Issue.visible.where(:id => @unsaved_issues.map(&:id)).all
+      @issues = Issue.visible.where(:id => @unsaved_issues.map(&:id)).to_a
       bulk_edit
       render :action => 'bulk_edit'
     end

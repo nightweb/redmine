@@ -133,7 +133,7 @@ module Redmine
             if options[:offset]
               scope_with_limit = scope_with_limit.where("#{searchable_options[:date_column]} #{options[:before] ? '<' : '>'} ?", options[:offset])
             end
-            results = scope_with_limit.all
+            results = scope_with_limit.to_a
 
             [results, results_count]
           end

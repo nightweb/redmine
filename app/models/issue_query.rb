@@ -133,17 +133,17 @@ class IssueQuery < Query
     if project
       principals += project.principals.sort
       unless project.leaf?
-        subprojects = project.descendants.visible.all
+        subprojects = project.descendants.visible.to_a
         principals += Principal.member_of(subprojects)
       end
-      versions = project.shared_versions.all
-      categories = project.issue_categories.all
+      versions = project.shared_versions.to_a
+      categories = project.issue_categories.to_a
       issue_custom_fields = project.all_issue_custom_fields
     else
       if all_projects.any?
         principals += Principal.member_of(all_projects)
       end
-      versions = Version.visible.where(:sharing => 'system').all
+      versions = Version.visible.where(:sharing => 'system').to_a
       issue_custom_fields = IssueCustomField.where(:is_for_all => true)
     end
     principals.uniq!
@@ -151,7 +151,7 @@ class IssueQuery < Query
     users = principals.select {|p| p.is_a?(User)}
 
     add_available_filter "status_id",
-      :type => :list_status, :values => IssueStatus.sorted.all.collect{|s| [s.name, s.id.to_s] }
+      :type => :list_status, :values => IssueStatus.sorted.to_a.collect{|s| [s.name, s.id.to_s] }
 
     if project.nil?
       project_values = []
@@ -338,7 +338,7 @@ class IssueQuery < Query
       scope = scope.preload(:custom_values)
     end
 
-    issues = scope.all
+    issues = scope.to_a
 
     if has_column?(:spent_hours)
       Issue.load_visible_spent_hours(issues)
@@ -380,7 +380,7 @@ class IssueQuery < Query
       limit(options[:limit]).
       offset(options[:offset]).
       preload(:details, :user, {:issue => [:project, :author, :tracker, :status]}).
-      all
+      to_a
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
@@ -412,7 +412,7 @@ class IssueQuery < Query
       groups = Group.all
       operator = '!' # Override the operator since we want to find by assigned_to
     else
-      groups = Group.where(:id => value).all
+      groups = Group.where(:id => value).to_a
     end
     groups ||= []
 

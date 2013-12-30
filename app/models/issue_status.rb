@@ -43,7 +43,7 @@ class IssueStatus < ActiveRecord::Base
   # Update all the +Issues+ setting their done_ratio to the value of their +IssueStatus+
   def self.update_issue_done_ratios
     if Issue.use_status_for_done_ratio?
-      IssueStatus.where("default_done_ratio >= 0").all.each do |status|
+      IssueStatus.where("default_done_ratio >= 0").to_a.each do |status|
         Issue.where({:status_id => status.id}).update_all({:done_ratio => status.default_done_ratio})
       end
     end
@@ -79,7 +79,7 @@ class IssueStatus < ActiveRecord::Base
         includes(:new_status).
         where(["role_id IN (:role_ids) AND tracker_id = :tracker_id AND (#{conditions})",
           {:role_ids => roles.collect(&:id), :tracker_id => tracker.id, :true => true, :false => false}
-          ]).all.
+          ]).to_a.
         map(&:new_status).compact.sort
     else
       []

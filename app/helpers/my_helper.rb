@@ -28,7 +28,7 @@ module MyHelper
   end
 
   def documents_items
-    Document.visible.order("#{Document.table_name}.created_on DESC").limit(10).all
+    Document.visible.order("#{Document.table_name}.created_on DESC").limit(10).to_a
   end
 
   def issuesassignedtome_items
@@ -52,7 +52,7 @@ module MyHelper
   end
 
   def issueswatched_items
-    Issue.visible.on_active_project.watched_by(User.current.id).recently_updated.limit(10).all
+    Issue.visible.on_active_project.watched_by(User.current.id).recently_updated.limit(10).to_a
   end
 
   def news_items

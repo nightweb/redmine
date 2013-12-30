@@ -476,7 +476,7 @@ module ApplicationHelper
       h(Setting.app_title)
     else
       b = []
-      ancestors = (@project.root? ? [] : @project.ancestors.visible.all)
+      ancestors = (@project.root? ? [] : @project.ancestors.visible.to_a)
       if ancestors.any?
         root = ancestors.shift
         b << link_to_project(root, {:jump => current_menu_item}, :class => 'root')

@@ -52,7 +52,7 @@ class WatchersController < ApplicationController
   def append
     if params[:watcher].is_a?(Hash)
       user_ids = params[:watcher][:user_ids] || [params[:watcher][:user_id]]
-      @users = User.active.where(:id => user_ids).all
+      @users = User.active.where(:id => user_ids).to_a
     end
   end
 
@@ -66,7 +66,7 @@ class WatchersController < ApplicationController
   end
 
   def autocomplete_for_user
-    @users = User.active.sorted.like(params[:q]).limit(100).all
+    @users = User.active.sorted.like(params[:q]).limit(100).to_a
     if @watched
       @users -= @watched.watcher_users
     end
@@ -91,7 +91,7 @@ class WatchersController < ApplicationController
   def find_watchables
     klass = Object.const_get(params[:object_type].camelcase) rescue nil
     if klass && klass.respond_to?('watched_by')
-      @watchables = klass.where(:id => Array.wrap(params[:object_id])).all
+      @watchables = klass.where(:id => Array.wrap(params[:object_id])).to_a
       raise Unauthorized if @watchables.any? {|w| w.respond_to?(:visible?) && !w.visible?}
     end
     render_404 unless @watchables.present?

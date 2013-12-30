@@ -42,7 +42,7 @@ class TimeEntryQuery < Query
     if project
       principals += project.principals.sort
       unless project.leaf?
-        subprojects = project.descendants.visible.all
+        subprojects = project.descendants.visible.to_a
         if subprojects.any?
           add_available_filter "subproject_id",
             :type => :list_subprojects,
@@ -91,8 +91,8 @@ class TimeEntryQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = self.class.available_columns.dup
-    @available_columns += TimeEntryCustomField.visible.all.map {|cf| QueryCustomFieldColumn.new(cf) }
-    @available_columns += IssueCustomField.visible.all.map {|cf| QueryAssociationCustomFieldColumn.new(:issue, cf) }
+    @available_columns += TimeEntryCustomField.visible.to_a.map {|cf| QueryCustomFieldColumn.new(cf) }
+    @available_columns += IssueCustomField.visible.to_a.map {|cf| QueryAssociationCustomFieldColumn.new(:issue, cf) }
     @available_columns
   end
 

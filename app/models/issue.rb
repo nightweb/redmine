@@ -205,7 +205,7 @@ class Issue < ActiveRecord::Base
 
   # Overrides Redmine::Acts::Customizable::InstanceMethods#available_custom_fields
   def available_custom_fields
-    (project && tracker) ? (project.all_issue_custom_fields & tracker.custom_fields.all) : []
+    (project && tracker) ? (project.all_issue_custom_fields & tracker.custom_fields.to_a) : []
   end
 
   def visible_custom_field_values(user=nil)
@@ -529,7 +529,7 @@ class Issue < ActiveRecord::Base
     return {} if roles.empty?
 
     result = {}
-    workflow_permissions = WorkflowPermission.where(:tracker_id => tracker_id, :old_status_id => status_id, :role_id => roles.map(&:id)).all
+    workflow_permissions = WorkflowPermission.where(:tracker_id => tracker_id, :old_status_id => status_id, :role_id => roles.map(&:id)).to_a
     if workflow_permissions.any?
       workflow_rules = workflow_permissions.inject({}) do |h, wp|
         h[wp.field_name] ||= []
@@ -733,7 +733,7 @@ class Issue < ActiveRecord::Base
   def assignable_versions
     return @assignable_versions if @assignable_versions
 
-    versions = project.shared_versions.open.all
+    versions = project.shared_versions.open.to_a
     if fixed_version
       if fixed_version_id_changed?
         # nothing to do

@@ -42,7 +42,7 @@ class Repository::Subversion < Repository
     revisions = scm.revisions(path, rev, nil, :limit => limit)
     if revisions
       identifiers = revisions.collect(&:identifier).compact
-      changesets.where(:revision => identifiers).reorder("committed_on DESC").includes(:repository, :user).all
+      changesets.where(:revision => identifiers).reorder("committed_on DESC").includes(:repository, :user).to_a
     else
       []
     end
@@ -95,7 +95,7 @@ class Repository::Subversion < Repository
     identifiers = entries_with_identifier.map {|entry| entry.lastrev.identifier}.compact.uniq
 
     if identifiers.any?
-      changesets_by_identifier = changesets.where(:revision => identifiers).includes(:user, :repository).all.group_by(&:revision)
+      changesets_by_identifier = changesets.where(:revision => identifiers).includes(:user, :repository).to_a.group_by(&:revision)
       entries_with_identifier.each do |entry|
         if m = changesets_by_identifier[entry.lastrev.identifier]
           entry.changeset = m.first

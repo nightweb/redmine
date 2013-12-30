@@ -316,7 +316,7 @@ class ProjectTest < ActiveSupport::TestCase
 
     parent.reload
     assert_equal 4, parent.children.size
-    assert_equal parent.children.all.sort_by(&:name), parent.children.all
+    assert_equal parent.children.to_a.sort_by(&:name), parent.children.to_a
   end
 
   def test_set_parent_should_update_issue_fixed_version_associations_when_a_fixed_version_is_moved_out_of_the_hierarchy
@@ -584,7 +584,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal [1,2,3], parent.version_ids.sort
     assert_equal [4], child.version_ids
     assert_equal [6], private_child.version_ids
-    assert_equal [7], Version.where(:sharing => 'system').all.collect(&:id)
+    assert_equal [7], Version.where(:sharing => 'system').to_a.collect(&:id)
 
     assert_equal 6, parent.shared_versions.size
     parent.shared_versions.each do |version|
@@ -729,7 +729,7 @@ class ProjectTest < ActiveSupport::TestCase
 
   def test_activities_should_use_the_system_activities
     project = Project.find(1)
-    assert_equal project.activities, TimeEntryActivity.where(:active => true).all
+    assert_equal project.activities, TimeEntryActivity.where(:active => true).to_a
   end
 
 

@@ -107,13 +107,13 @@ class IssueStatusTest < ActiveSupport::TestCase
 
     with_settings :issue_done_ratio => 'issue_status' do
       IssueStatus.update_issue_done_ratios
-      issues = Issue.where(:status_id => 1).all
+      issues = Issue.where(:status_id => 1).to_a
       assert_equal [50], issues.map {|issue| issue.read_attribute(:done_ratio)}.uniq
     end
   end
 
   def test_sorted_scope
-    assert_equal IssueStatus.all.sort, IssueStatus.sorted.all
+    assert_equal IssueStatus.all.sort, IssueStatus.sorted.to_a
   end
 
   def test_named_scope

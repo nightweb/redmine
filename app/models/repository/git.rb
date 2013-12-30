@@ -192,7 +192,7 @@ class Repository::Git < Repository
     revisions_copy = revisions.clone # revisions will change
     while offset < revisions_copy.size
       scmids = revisions_copy.slice(offset, limit).map{|x| x.scmid}
-      recent_changesets_slice = changesets.where(:scmid => scmids).all
+      recent_changesets_slice = changesets.where(:scmid => scmids).to_a
       # Subtract revisions that redmine already knows about
       recent_revisions = recent_changesets_slice.map{|c| c.scmid}
       revisions.reject!{|r| recent_revisions.include?(r.scmid)}
@@ -241,7 +241,7 @@ class Repository::Git < Repository
     revisions = scm.revisions(path, nil, rev, :limit => limit, :all => false)
     return [] if revisions.nil? || revisions.empty?
 
-    changesets.where(:scmid => revisions.map {|c| c.scmid}).all
+    changesets.where(:scmid => revisions.map {|c| c.scmid}).to_a
   end
 
   def clear_extra_info_of_changesets

@@ -47,10 +47,10 @@ class WorkflowsController < ApplicationController
     if @tracker && @used_statuses_only && @tracker.issue_statuses.any?
       @statuses = @tracker.issue_statuses
     end
-    @statuses ||= IssueStatus.sorted.all
+    @statuses ||= IssueStatus.sorted.to_a
 
     if @tracker && @role && @statuses.any?
-      workflows = WorkflowTransition.where(:role_id => @role.id, :tracker_id => @tracker.id).all
+      workflows = WorkflowTransition.where(:role_id => @role.id, :tracker_id => @tracker.id).to_a
       @workflows = {}
       @workflows['always'] = workflows.select {|w| !w.author && !w.assignee}
       @workflows['author'] = workflows.select {|w| w.author}
@@ -72,13 +72,13 @@ class WorkflowsController < ApplicationController
     if @tracker && @used_statuses_only && @tracker.issue_statuses.any?
       @statuses = @tracker.issue_statuses
     end
-    @statuses ||= IssueStatus.sorted.all
+    @statuses ||= IssueStatus.sorted.to_a
 
     if @role && @tracker
       @fields = (Tracker::CORE_FIELDS_ALL - @tracker.disabled_core_fields).map {|field| [field, l("field_"+field.sub(/_id$/, ''))]}
       @custom_fields = @tracker.custom_fields
 
-      @permissions = WorkflowPermission.where(:tracker_id => @tracker.id, :role_id => @role.id).all.inject({}) do |h, w|
+      @permissions = WorkflowPermission.where(:tracker_id => @tracker.id, :role_id => @role.id).to_a.inject({}) do |h, w|
         h[w.old_status_id] ||= {}
         h[w.old_status_id][w.field_name] = w.rule
         h
@@ -99,9 +99,9 @@ class WorkflowsController < ApplicationController
       @source_role = Role.find_by_id(params[:source_role_id].to_i)
     end
     @target_trackers = params[:target_tracker_ids].blank? ?
-        nil : Tracker.where(:id => params[:target_tracker_ids]).all
+        nil : Tracker.where(:id => params[:target_tracker_ids]).to_a
     @target_roles = params[:target_role_ids].blank? ?
-        nil : Role.where(:id => params[:target_role_ids]).all
+        nil : Role.where(:id => params[:target_role_ids]).to_a
     if request.post?
       if params[:source_tracker_id].blank? || params[:source_role_id].blank? || (@source_tracker.nil? && @source_role.nil?)
         flash.now[:error] = l(:error_workflow_copy_source)
@@ -118,10 +118,10 @@ class WorkflowsController < ApplicationController
   private
 
   def find_roles
-    @roles = Role.sorted.all
+    @roles = Role.sorted.to_a
   end
 
   def find_trackers
-    @trackers = Tracker.sorted.all
+    @trackers = Tracker.sorted.to_a
   end
 end
