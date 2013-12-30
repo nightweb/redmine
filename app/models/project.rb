@@ -28,31 +28,46 @@ class Project < ActiveRecord::Base
 
   # Specific overidden Activities
   has_many :time_entry_activities
-  has_many :members, :include => [:principal, :roles], :conditions => "#{Principal.table_name}.type='User' AND #{Principal.table_name}.status=#{Principal::STATUS_ACTIVE}"
+  has_many :members,
+           -> { includes([:principal, :roles]).
+                 where("#{Principal.table_name}.type='User' AND #{Principal.table_name}.status=#{Principal::STATUS_ACTIVE}") }
   has_many :memberships, :class_name => 'Member'
-  has_many :member_principals, :class_name => 'Member',
-                               :include => :principal,
-                               :conditions => "#{Principal.table_name}.type='Group' OR (#{Principal.table_name}.type='User' AND #{Principal.table_name}.status=#{Principal::STATUS_ACTIVE})"
-
+  has_many :member_principals,
+            -> { includes(:principal).
+                    where("#{Principal.table_name}.type='Group' OR (#{Principal.table_name}.type='User' AND #{Principal.table_name}.status=#{Principal::STATUS_ACTIVE})") },
+           :class_name => 'Member'
   has_many :enabled_modules, :dependent => :delete_all
-  has_and_belongs_to_many :trackers, :order => "#{Tracker.table_name}.position"
-  has_many :issues, :dependent => :destroy, :include => [:status, :tracker]
+  has_and_belongs_to_many :trackers,
+                          -> { order("#{Tracker.table_name}.position") }
+  has_many :issues,
+           -> { includes([:status, :tracker]) },
+           :dependent => :destroy
   has_many :issue_changes, :through => :issues, :source => :journals
-  has_many :versions, :dependent => :destroy, :order => "#{Version.table_name}.effective_date DESC, #{Version.table_name}.name DESC"
+  has_many :versions,
+           -> { order("#{Version.table_name}.effective_date DESC").
+                    order("#{Version.table_name}.name DESC") },
+           :dependent => :destroy
   has_many :time_entries, :dependent => :destroy
   has_many :queries, :class_name => 'IssueQuery', :dependent => :delete_all
   has_many :documents, :dependent => :destroy
-  has_many :news, :dependent => :destroy, :include => :author
-  has_many :issue_categories, :dependent => :delete_all, :order => "#{IssueCategory.table_name}.name"
-  has_many :boards, :dependent => :destroy, :order => "position ASC"
-  has_one :repository, :conditions => ["is_default = ?", true]
+  has_many :news,
+            -> { includes(:author) },
+           :dependent => :destroy 
+  has_many :issue_categories,
+            -> { order("#{IssueCategory.table_name}.name") },
+           :dependent => :delete_all
+  has_many :boards,
+            -> { order("position ASC") },
+           :dependent => :destroy 
+  has_one :repository,
+          -> { where("is_default = ?", true) }
   has_many :repositories, :dependent => :destroy
   has_many :changesets, :through => :repository
   has_one :wiki, :dependent => :destroy
   # Custom field for the project issues
   has_and_belongs_to_many :issue_custom_fields,
+                          -> { order("#{CustomField.table_name}.position") },
                           :class_name => 'IssueCustomField',
-                          :order => "#{CustomField.table_name}.position",
                           :join_table => "#{table_name_prefix}custom_fields_projects#{table_name_suffix}",
                           :association_foreign_key => 'custom_field_id'
 

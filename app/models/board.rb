@@ -18,8 +18,13 @@
 class Board < ActiveRecord::Base
   include Redmine::SafeAttributes
   belongs_to :project
-  has_many :topics, :class_name => 'Message', :conditions => "#{Message.table_name}.parent_id IS NULL", :order => "#{Message.table_name}.created_on DESC"
-  has_many :messages, :dependent => :destroy, :order => "#{Message.table_name}.created_on DESC"
+  has_many :topics,
+           -> { where("#{Message.table_name}.parent_id IS NULL").
+                   order("#{Message.table_name}.created_on DESC") },
+           :class_name => 'Message'
+  has_many :messages,
+            -> { order("#{Message.table_name}.created_on DESC") },
+           :dependent => :destroy
   belongs_to :last_message, :class_name => 'Message', :foreign_key => :last_message_id
   acts_as_tree :dependent => :nullify
   acts_as_list :scope => '(project_id = #{project_id} AND parent_id #{parent_id ? "= #{parent_id}" : "IS NULL"})'

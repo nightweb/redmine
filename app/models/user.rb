@@ -74,8 +74,12 @@ class User < Principal
                           :after_remove => Proc.new {|user, group| group.user_removed(user)}
   has_many :changesets, :dependent => :nullify
   has_one :preference, :dependent => :destroy, :class_name => 'UserPreference'
-  has_one :rss_token, :class_name => 'Token', :conditions => "action='feeds'"
-  has_one :api_token, :class_name => 'Token', :conditions => "action='api'"
+  has_one :rss_token,
+          -> { where("action='feeds'") },
+          :class_name => 'Token'
+  has_one :api_token,
+          -> { where("action='api'") },
+          :class_name => 'Token'
   belongs_to :auth_source
 
   scope :logged, lambda { where("#{User.table_name}.status <> #{STATUS_ANONYMOUS}") }

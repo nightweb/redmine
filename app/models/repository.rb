@@ -25,7 +25,9 @@ class Repository < ActiveRecord::Base
   IDENTIFIER_MAX_LENGTH = 255
 
   belongs_to :project
-  has_many :changesets, :order => "#{Changeset.table_name}.committed_on DESC, #{Changeset.table_name}.id DESC"
+  has_many :changesets,
+           -> {order(:committed_on => :desc).order(:id => :desc)}
+             
   has_many :filechanges, :class_name => 'Change', :through => :changesets
 
   serialize :extra_info
