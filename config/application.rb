@@ -58,6 +58,8 @@ module RedmineApp
     # On Rails4, AR.new and AR.create fail
     config.active_record.whitelist_attributes = false
 
+    config.active_record.disable_implicit_join_references = true
+
     if File.exists?(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
       instance_eval File.read(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
     end
