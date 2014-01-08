@@ -7,7 +7,9 @@ gem "fastercsv", "~> 1.5.0", :platforms => [:mri_18, :mingw_18, :jruby]
 gem "builder", "3.0.0"
 gem "mime-types"
 
-gem "awesome_nested_set"
+gem "awesome_nested_set",
+    :git => "git://github.com/collectiveidea/awesome_nested_set.git",
+    :branch => "2-1-stable"
 
 # Optional gem for LDAP authentication
 group :ldap do
