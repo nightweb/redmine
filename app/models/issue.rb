@@ -73,17 +73,23 @@ class Issue < ActiveRecord::Base
   validate :validate_issue, :validate_required_fields
 
   scope :visible, lambda {|*args|
-    includes(:project).where(Issue.visible_condition(args.shift || User.current, *args))
+    includes(:project).
+      where(Issue.visible_condition(args.shift || User.current, *args)).
+      references(:project)
   }
 
   scope :open, lambda {|*args|
     is_closed = args.size > 0 ? !args.first : false
-    includes(:status).where("#{IssueStatus.table_name}.is_closed = ?", is_closed)
+    includes(:status).
+      where("#{IssueStatus.table_name}.is_closed = ?", is_closed).
+      references(:status)
   }
 
   scope :recently_updated, lambda { order("#{Issue.table_name}.updated_on DESC") }
   scope :on_active_project, lambda {
-    includes(:status, :project, :tracker).where("#{Project.table_name}.status = ?", Project::STATUS_ACTIVE)
+    includes(:status, :project, :tracker).
+      where("#{Project.table_name}.status = ?", Project::STATUS_ACTIVE).
+      references(:status, :project, :tracker)
   }
   scope :fixed_version, lambda {|versions|
     ids = [versions].flatten.compact.map {|v| v.is_a?(Version) ? v.id : v}
@@ -873,10 +879,17 @@ class Issue < ActiveRecord::Base
     if issues.any?
       issue_ids = issues.map(&:id)
       # Relations with issue_from in given issues and visible issue_to
-      relations_from = IssueRelation.includes(:issue_to => [:status, :project]).where(visible_condition(user)).where(:issue_from_id => issue_ids).all
+      relations_from = IssueRelation.includes(:issue_to => [:status, :project]).
+                         where(visible_condition(user)).
+                         where(:issue_from_id => issue_ids).
+                         references(:issue_to => [:status, :project]).
+                         to_a
       # Relations with issue_to in given issues and visible issue_from
-      relations_to = IssueRelation.includes(:issue_from => [:status, :project]).where(visible_condition(user)).where(:issue_to_id => issue_ids).all
-
+      relations_to = IssueRelation.includes(:issue_from => [:status, :project]).
+                         where(visible_condition(user)).
+                         where(:issue_to_id => issue_ids).
+                         references(:issue_to => [:status, :project]).
+                         to_a
       issues.each do |issue|
         relations =
           relations_from.select {|relation| relation.issue_from_id == issue.id} +
@@ -1384,6 +1397,7 @@ class Issue < ActiveRecord::Base
       where("#{Issue.table_name}.fixed_version_id IS NOT NULL" +
         " AND #{Issue.table_name}.project_id <> #{Version.table_name}.project_id" +
         " AND #{Version.table_name}.sharing <> 'system'").
+        references(:version).
       where(conditions).each do |issue|
       next if issue.project.nil? || issue.fixed_version.nil?
       unless issue.project.shared_versions.include?(issue.fixed_version)

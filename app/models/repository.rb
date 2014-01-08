@@ -304,7 +304,8 @@ class Repository < ActiveRecord::Base
       return @found_committer_users[committer] if @found_committer_users.has_key?(committer)
 
       user = nil
-      c = changesets.where(:committer => committer).includes(:user).first
+      c = changesets.includes(:user).where(:committer => committer).
+            references(:user).first
       if c && c.user
         user = c.user
       elsif committer.strip =~ /^([^<]+)(<(.*)>)?$/

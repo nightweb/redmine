@@ -39,7 +39,9 @@ class News < ActiveRecord::Base
   after_create :send_notification
 
   scope :visible, lambda {|*args|
-    includes(:project).where(Project.allowed_to_condition(args.shift || User.current, :view_news, *args))
+    includes(:project).
+      where(Project.allowed_to_condition(args.shift || User.current, :view_news, *args)).
+      references([:author, :project])
   }
 
   safe_attributes 'title', 'summary', 'description'
@@ -59,7 +61,8 @@ class News < ActiveRecord::Base
 
   # returns latest news for projects visible by user
   def self.latest(user = User.current, count = 5)
-    visible(user).includes([:author, :project]).order("#{News.table_name}.created_on DESC").limit(count).all
+    visible(user).includes([:author, :project]).
+      order("#{News.table_name}.created_on DESC").limit(count).to_a
   end
 
   private

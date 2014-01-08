@@ -45,7 +45,8 @@ class IssueQuery < Query
   scope :visible, lambda {|*args|
     user = args.shift || User.current
     base = Project.allowed_to_condition(user, :view_issues, *args)
-    scope = includes(:project).where("#{table_name}.project_id IS NULL OR (#{base})")
+    scope = includes(:project).where("#{table_name}.project_id IS NULL OR (#{base})").
+              references(:project)
 
     if user.admin?
       scope.where("#{table_name}.visibility <> ? OR #{table_name}.user_id = ?", VISIBILITY_PRIVATE, user.id)
@@ -359,6 +360,7 @@ class IssueQuery < Query
       where(statement).
       includes(([:status, :project] + (options[:include] || [])).uniq).
       where(options[:conditions]).
+      references(([:status, :project] + (options[:include] || [])).uniq).
       order(order_option).
       joins(joins_for_order_statement(order_option.join(','))).
       limit(options[:limit]).
@@ -387,10 +389,11 @@ class IssueQuery < Query
   # Valid options are :conditions
   def versions(options={})
     Version.visible.
+      includes(:project).
       where(project_statement).
       where(options[:conditions]).
-      includes(:project).
-      all
+      references(:project).
+      to_a
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end

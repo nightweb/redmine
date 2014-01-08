@@ -30,11 +30,13 @@ class Project < ActiveRecord::Base
   has_many :time_entry_activities
   has_many :members,
            -> { includes([:principal, :roles]).
-                 where("#{Principal.table_name}.type='User' AND #{Principal.table_name}.status=#{Principal::STATUS_ACTIVE}") }
+                 where("#{Principal.table_name}.type='User' AND #{Principal.table_name}.status=#{Principal::STATUS_ACTIVE}").
+                 references(:principal) }
   has_many :memberships, :class_name => 'Member'
   has_many :member_principals,
             -> { includes(:principal).
-                    where("#{Principal.table_name}.type='Group' OR (#{Principal.table_name}.type='User' AND #{Principal.table_name}.status=#{Principal::STATUS_ACTIVE})") },
+                    where("#{Principal.table_name}.type='Group' OR (#{Principal.table_name}.type='User' AND #{Principal.table_name}.status=#{Principal::STATUS_ACTIVE})").
+                    references(:principal) },
            :class_name => 'Member'
   has_many :enabled_modules, :dependent => :delete_all
   has_and_belongs_to_many :trackers,
@@ -447,6 +449,7 @@ class Project < ActiveRecord::Base
         joins("JOIN #{EnabledModule.table_name} ON #{EnabledModule.table_name}.project_id = #{Project.table_name}.id AND #{EnabledModule.table_name}.name = 'issue_tracking'").
         select("DISTINCT #{Tracker.table_name}.*").
         where("#{Project.table_name}.lft >= ? AND #{Project.table_name}.rgt <= ? AND #{Project.table_name}.status <> #{STATUS_ARCHIVED}", lft, rgt).
+        references(:project).
         sorted.
         all
   end
@@ -467,7 +470,8 @@ class Project < ActiveRecord::Base
     @rolled_up_versions ||=
       Version.
         includes(:project).
-        where("#{Project.table_name}.lft >= ? AND #{Project.table_name}.rgt <= ? AND #{Project.table_name}.status <> ?", lft, rgt, STATUS_ARCHIVED)
+        where("#{Project.table_name}.lft >= ? AND #{Project.table_name}.rgt <= ? AND #{Project.table_name}.status <> ?", lft, rgt, STATUS_ARCHIVED).
+        references(:project)
   end
 
   # Returns a scope of the Versions used by the project
@@ -475,7 +479,8 @@ class Project < ActiveRecord::Base
     if new_record?
       Version.
         includes(:project).
-        where("#{Project.table_name}.status <> ? AND #{Version.table_name}.sharing = 'system'", STATUS_ARCHIVED)
+        where("#{Project.table_name}.status <> ? AND #{Version.table_name}.sharing = 'system'", STATUS_ARCHIVED).
+        references(:project)
     else
       @shared_versions ||= begin
         r = root? ? self : root
@@ -487,7 +492,8 @@ class Project < ActiveRecord::Base
                     " OR (#{Project.table_name}.lft >= #{r.lft} AND #{Project.table_name}.rgt <= #{r.rgt} AND #{Version.table_name}.sharing = 'tree')" +
                     " OR (#{Project.table_name}.lft < #{lft} AND #{Project.table_name}.rgt > #{rgt} AND #{Version.table_name}.sharing IN ('hierarchy', 'descendants'))" +
                     " OR (#{Project.table_name}.lft > #{lft} AND #{Project.table_name}.rgt < #{rgt} AND #{Version.table_name}.sharing = 'hierarchy')" +
-                  "))")
+                  "))").
+        references(:project)
       end
     end
   end

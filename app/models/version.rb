@@ -37,7 +37,9 @@ class Version < ActiveRecord::Base
   scope :named, lambda {|arg| where("LOWER(#{table_name}.name) = LOWER(?)", arg.to_s.strip)}
   scope :open, lambda { where(:status => 'open') }
   scope :visible, lambda {|*args|
-    includes(:project).where(Project.allowed_to_condition(args.first || User.current, :view_issues))
+    includes(:project).
+      where(Project.allowed_to_condition(args.first || User.current, :view_issues)).
+      references(:project)
   }
 
   safe_attributes 'name',

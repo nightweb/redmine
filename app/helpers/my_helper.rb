@@ -20,10 +20,11 @@
 module MyHelper
   def calendar_items(startdt, enddt)
     Issue.visible.
+      includes(:project, :tracker, :priority, :assigned_to).
       where(:project_id => User.current.projects.map(&:id)).
       where("(start_date>=? and start_date<=?) or (due_date>=? and due_date<=?)", startdt, enddt, startdt, enddt).
-      includes(:project, :tracker, :priority, :assigned_to).
-      all
+      references(:project, :tracker, :priority, :assigned_to).
+      to_a
   end
 
   def documents_items
@@ -32,20 +33,22 @@ module MyHelper
 
   def issuesassignedtome_items
     Issue.visible.open.
+      includes(:status, :project, :tracker, :priority).
       where(:assigned_to_id => ([User.current.id] + User.current.group_ids)).
       limit(10).
-      includes(:status, :project, :tracker, :priority).
+      references(:status, :project, :tracker, :priority).
       order("#{IssuePriority.table_name}.position DESC, #{Issue.table_name}.updated_on DESC").
-      all
+      to_a
   end
 
   def issuesreportedbyme_items
     Issue.visible.
-      where(:author_id => User.current.id).
-      limit(10).
       includes(:status, :project, :tracker).
+      where(:author_id => User.current.id).
+      references(:status, :project, :tracker).
+      limit(10).
       order("#{Issue.table_name}.updated_on DESC").
-      all
+      to_a
   end
 
   def issueswatched_items
@@ -54,18 +57,20 @@ module MyHelper
 
   def news_items
     News.visible.
-      where(:project_id => User.current.projects.map(&:id)).
-      limit(10).
       includes(:project, :author).
+      where(:project_id => User.current.projects.map(&:id)).
+      references(:project, :author).
+      limit(10).
       order("#{News.table_name}.created_on DESC").
-      all
+      to_a
   end
 
   def timelog_items
     TimeEntry.
-      where("#{TimeEntry.table_name}.user_id = ? AND #{TimeEntry.table_name}.spent_on BETWEEN ? AND ?", User.current.id, Date.today - 6, Date.today).
       includes(:activity, :project, {:issue => [:tracker, :status]}).
+      where("#{TimeEntry.table_name}.user_id = ? AND #{TimeEntry.table_name}.spent_on BETWEEN ? AND ?", User.current.id, Date.today - 6, Date.today).
+      references(:activity, :project, {:issue => [:tracker, :status]}).
       order("#{TimeEntry.table_name}.spent_on DESC, #{Project.table_name}.name ASC, #{Tracker.table_name}.position ASC, #{Issue.table_name}.id ASC").
-      all
+      to_a
   end
 end
