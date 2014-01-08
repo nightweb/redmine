@@ -211,7 +211,7 @@ class AccountController < ApplicationController
           :return_to => back_url, :method => :post
     ) do |result, identity_url, registration|
       if result.successful?
-        user = User.find_or_initialize_by_identity_url(identity_url)
+        user = User.find_or_initialize_by(:identity_url => identity_url)
         if user.new_record?
           # Self-registration off
           (redirect_to(home_url); return) unless Setting.self_registration?
