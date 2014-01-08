@@ -10,11 +10,6 @@ gem "mime-types"
 gem "protected_attributes"
 gem "actionpack-action_caching"
 
-gem "awesome_nested_set",
-    :git => "git://github.com/collectiveidea/awesome_nested_set.git",
-    # :branch => "2-1-stable"
-    :branch => "master"
-
 # Optional gem for LDAP authentication
 group :ldap do
   gem "net-ldap", "~> 0.3.1"
