@@ -78,8 +78,9 @@ module Redmine
               ActiveSupport::Deprecation.warn "acts_as_activity_provider with implicit :permission option is deprecated. Add a visible scope to the #{self.name} model or use explicit :permission option."
               scope = scope.where(Project.allowed_to_condition(user, "view_#{self.name.underscore.pluralize}".to_sym, options))
             end
-
-            scope.all(provider_options[:find_options].dup)
+            ActiveSupport::Deprecation.silence do
+              scope.all(provider_options[:find_options].dup)
+            end
           end
         end
       end
