@@ -100,7 +100,10 @@ module Redmine
 
             tokens_conditions = [sql, * (tokens.collect {|w| "%#{w.downcase}%"} * token_clauses.size).sort]
 
-            scope = self.scoped
+            scope = nil
+            ActiveSupport::Deprecation.silence do
+              scope = self.scoped
+            end
             project_conditions = []
             if searchable_options.has_key?(:permission)
               project_conditions << Project.allowed_to_condition(user, searchable_options[:permission] || :view_project)
