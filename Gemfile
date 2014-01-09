@@ -9,7 +9,8 @@ gem "mime-types"
 
 gem "awesome_nested_set",
     :git => "git://github.com/collectiveidea/awesome_nested_set.git",
-    :branch => "2-1-stable"
+    # :branch => "2-1-stable"
+    :branch => "master"
 
 # Optional gem for LDAP authentication
 group :ldap do
