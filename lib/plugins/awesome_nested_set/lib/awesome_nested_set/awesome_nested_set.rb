@@ -467,17 +467,14 @@ module CollectiveIdea #:nodoc:
 
             # update lefts and rights for remaining nodes
             diff = right - left + 1
-            nested_set_scope.update_all(
-              ["#{quoted_left_column_name} = (#{quoted_left_column_name} - ?)", diff],
-              ["#{quoted_left_column_name} > ?", right]
-            )
-            nested_set_scope.update_all(
-              ["#{quoted_right_column_name} = (#{quoted_right_column_name} - ?)", diff],
-              ["#{quoted_right_column_name} > ?", right]
-              )
-              
-reload
-              # Don't allow multiple calls to destroy to corrupt the set
+            nested_set_scope.
+              where(["#{quoted_left_column_name} > ?", right]).
+              update_all(["#{quoted_left_column_name} = (#{quoted_left_column_name} - ?)", diff])
+            nested_set_scope.
+              where(["#{quoted_right_column_name} > ?", right]).
+              update_all(["#{quoted_right_column_name} = (#{quoted_right_column_name} - ?)", diff])
+            reload
+            # Don't allow multiple calls to destroy to corrupt the set
             self.skip_before_destroy = true
           end
         end
