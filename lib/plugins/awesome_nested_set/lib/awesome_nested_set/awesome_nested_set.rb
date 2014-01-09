@@ -451,7 +451,7 @@ module CollectiveIdea #:nodoc:
               select("id").
               where("#{quoted_left_column_name} >= ?", left).
               lock(true).
-              all
+              to_a
 
             if acts_as_nested_set_options[:dependent] == :destroy
               descendants.each do |model|
