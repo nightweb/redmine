@@ -121,7 +121,8 @@ module Redmine
               includes(searchable_options[:include]).
               order("#{searchable_options[:order_column]} " + (options[:before] ? 'DESC' : 'ASC')).
               where(project_conditions).
-              where(tokens_conditions)
+              where(tokens_conditions).
+              references(searchable_options[:include])
 
             results_count = scope.count
 
