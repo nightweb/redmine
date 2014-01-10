@@ -418,7 +418,10 @@ class IssuesController < ApplicationController
     @issue.project = @project
     @issue.author ||= User.current
     # Tracker must be set before custom field values
-    @issue.tracker ||= @project.trackers.find((params[:issue] && params[:issue][:tracker_id]) || params[:tracker_id] || :first)
+    ActiveSupport::Deprecation.silence do
+      @issue.tracker ||= @project.trackers.find((params[:issue] && params[:issue][:tracker_id]) ||
+                                                   params[:tracker_id] || :first)
+    end
     if @issue.tracker.nil?
       render_error l(:error_no_tracker_in_project)
       return false
