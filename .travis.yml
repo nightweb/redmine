@@ -1,0 +1,25 @@
+language: ruby
+rvm:
+  - 1.9.3
+  - 2.0.0
+env:
+  - "TEST_SUITE=rails4units       DATABASE_ADAPTER=sqlite3"
+  - "TEST_SUITE=rails4functionals DATABASE_ADAPTER=sqlite3"
+  - "TEST_SUITE=rails4integration DATABASE_ADAPTER=sqlite3"
+  # - "TEST_SUITE=rails4units     DATABASE_ADAPTER=mysql"
+  # - "TEST_SUITE=rails4units     DATABASE_ADAPTER=postgresql"
+before_install:
+  - "sudo apt-get update -qq"
+  - "sudo apt-get --no-install-recommends install bzr cvs git mercurial subversion"
+script:
+  - "SCMS=bazaar,cvs,subversion,git,mercurial,filesystem"
+  - "export SCMS"
+  - "bundle install"
+  - "RUBY_VER=1.9 BRANCH=trunk rake config/database.yml"
+  - "bundle install"
+  - "bundle exec rake ci"
+branches:
+  only:
+    - /^rails4.*$/
+notifications:
+  email: false
